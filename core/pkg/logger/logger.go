@@ -3,6 +3,8 @@ package logger
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"log"
 	"os"
 )
 
@@ -10,7 +12,7 @@ var (
 	Logger *zap.Logger
 )
 
-func InitLogger(debug bool) {
+func Init(debug bool) {
 	var core zapcore.Core
 	if debug {
 		consoleConfig := zap.NewDevelopmentEncoderConfig()
@@ -32,8 +34,10 @@ func InitLogger(debug bool) {
 	}
 
 	Logger = zap.New(core)
+
+	log.SetOutput(zap.NewStdLog(Logger).Writer())
 }
 
-func CloseLogger() {
+func Close() {
 	_ = Logger.Sync()
 }

@@ -2,7 +2,7 @@ module go-task/workspace-service
 
 go 1.20
 
-replace go-task/auth-service => ../user-service
+replace go-task/auth-service => ./../user
 
 require (
 	github.com/nats-io/nats.go v1.26.0
