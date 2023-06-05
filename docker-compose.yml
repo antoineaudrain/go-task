@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  user_db:
+    image: postgres:13
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: go_task
+      POSTGRES_PASSWORD: go_task
+      POSTGRES_DB: user_db
+    volumes:
+      - user_db:/var/lib/postgresql/data
+  workspace_db:
+    image: postgres:13
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: go_task
+      POSTGRES_PASSWORD: go_task
+      POSTGRES_DB: workspace_db
+    volumes:
+      - workspace_db:/var/lib/postgresql/data
+  nats:
+    image: nats:2.9.7
+    command: --jetstream
+    ports:
+      - "4222:4222"
+volumes:
+  user_db: {}
+  workspace_db: {}

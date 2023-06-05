@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "go-task/workspace-service";
+
+package workspace;
+
+service WorkspaceService {
+  rpc Create (CreateRequest) returns (CreateResponse) {}
+}
+
+message CreateRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message CreateResponse {
+  string token = 1;
+}
