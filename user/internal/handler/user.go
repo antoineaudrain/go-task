@@ -2,8 +2,8 @@ package handler
 
 import (
 	"context"
+	pb "go-task/user/api"
 	"go-task/user/internal/service"
-	pb "go-task/user/pkg/pb"
 	"go-task/user/pkg/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

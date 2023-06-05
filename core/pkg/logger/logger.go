@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -9,7 +10,7 @@ import (
 )
 
 var (
-	Logger *zap.Logger
+	logger *zap.Logger
 )
 
 func Init(debug bool) {
@@ -33,11 +34,23 @@ func Init(debug bool) {
 		)
 	}
 
-	Logger = zap.New(core)
+	logger = zap.New(core)
 
-	log.SetOutput(zap.NewStdLog(Logger).Writer())
+	log.SetOutput(zap.NewStdLog(logger).Writer())
 }
 
 func Close() {
-	_ = Logger.Sync()
+	_ = logger.Sync()
+}
+
+func Info(message string, args ...interface{}) {
+	logger.Info(fmt.Sprintf(message, args...))
+}
+
+func Warn(message string, args ...interface{}) {
+	logger.Warn(fmt.Sprintf(message, args...))
+}
+
+func Error(message string, args ...interface{}) {
+	logger.Error(fmt.Sprintf(message, args...))
 }

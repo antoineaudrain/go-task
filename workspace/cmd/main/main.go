@@ -2,7 +2,8 @@ package main
 
 import (
 	"go-task/core/pkg/logger"
-	"go-task/user/internal/server"
+	"go-task/workspace/internal/server"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,7 +17,7 @@ func main() {
 
 	go func() {
 		if err := s.Run(); err != nil {
-			logger.Error("Server failed to start: %v", err)
+			log.Fatalf("Server failed to start: %v", err)
 		}
 	}()
 
@@ -29,5 +30,5 @@ func waitForTerminationSignal() {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 	<-signalChan
-	logger.Error("Termination signal received. Shutting down gracefully.")
+	log.Println("Termination signal received. Shutting down gracefully.")
 }

@@ -3,20 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
-	pb "go-task/auth-service/pkg/pb"
+	pb "go-task/workspace/api"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	dial, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	dial, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
 	if err != nil {
 		return
 	}
 
-	client := pb.NewAuthServiceClient(dial)
-	user, err := client.LoginUser(context.Background(), &pb.LoginRequest{
-		Email:    "johndoe@example.com",
-		Password: "password",
+	client := pb.NewWorkspaceServiceClient(dial)
+	user, err := client.Create(context.Background(), &pb.CreateRequest{
+		Name: "My Workspace",
 	})
 	if err != nil {
 		return

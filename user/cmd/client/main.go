@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	pb "go-task/user/pkg/pb"
+	pb "go-task/user/api"
 	"google.golang.org/grpc"
 )
 

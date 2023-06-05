@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"go-task/core/pkg/logger"
-	"go-task/user/internal/handler"
+	"go-task/workspace/internal/handler"
 	"google.golang.org/grpc"
 	"net"
 )
@@ -17,15 +17,15 @@ func NewServer() *Server {
 }
 
 func (s *Server) Run() error {
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", ":50052")
 	if err != nil {
 		logger.Error("failed to listen", err)
 		return err
 	}
 	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(loggingInterceptor))
 
-	userHandler := handler.NewHandler()
-	userHandler.Register(s.grpcServer)
+	workspaceHandler := handler.NewHandler()
+	workspaceHandler.Register(s.grpcServer)
 
 	logger.Info("Server started and listening on :50051")
 

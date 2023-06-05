@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: auth_service.proto
+// source: workspace.proto
 
-package workspace_service
+package workspace
 
 import (
 	context "context"
@@ -101,5 +101,5 @@ var WorkspaceService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "auth_service.proto",
+	Metadata: "workspace.proto",
 }

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "go-task/workspace";
+
+package workspace;
+
+service WorkspaceService {
+  rpc Create(CreateRequest) returns (CreateResponse) {}
+}
+
+message CreateRequest {
+  string name = 1;
+}
+
+message Workspace {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message CreateResponse {
+  Workspace workspace = 1;
+}

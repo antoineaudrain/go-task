@@ -10,11 +10,9 @@ require (
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/nats-io/nats.go v1.26.0
 	go-task/core v0.0.0-00010101000000-000000000000
-	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.8.0
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (
@@ -33,8 +31,10 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
+	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230526203410-71b5a4ffd15e // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
