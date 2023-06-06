@@ -1,33 +1,32 @@
-package handler
+package user
 
 import (
 	"context"
 	"go-task/core/pkg/auth"
 	pb "go-task/user/api"
-	"go-task/user/internal/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"os"
 )
 
-type UserHandler struct {
+type Handler struct {
 	pb.UnimplementedUserServiceServer
-	userService *service.UserService
+	service Service
 }
 
-func NewHandler() *UserHandler {
-	return &UserHandler{
-		userService: service.NewUserService(),
+func NewHandler() *Handler {
+	return &Handler{
+		service: NewService(),
 	}
 }
 
-func (h *UserHandler) Register(s *grpc.Server) {
+func (h *Handler) Register(s *grpc.Server) {
 	pb.RegisterUserServiceServer(s, h)
 }
 
-func (h *UserHandler) Create(ctx context.Context, req *pb.CreateRequest) (*pb.CreateResponse, error) {
-	user, err := h.userService.Create(req.GetEmail(), req.GetPassword(), req.GetFullName())
+func (h *Handler) Create(ctx context.Context, req *pb.CreateRequest) (*pb.CreateResponse, error) {
+	user, err := h.service.Create(req.GetEmail(), req.GetPassword(), req.GetFullName())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Internal error")
 	}
@@ -41,8 +40,8 @@ func (h *UserHandler) Create(ctx context.Context, req *pb.CreateRequest) (*pb.Cr
 	}, nil
 }
 
-func (h *UserHandler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	user, err := h.userService.Authenticate(req.GetEmail(), req.GetPassword())
+func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+	user, err := h.service.Authenticate(req.GetEmail(), req.GetPassword())
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
 	}
@@ -68,18 +67,18 @@ func (h *UserHandler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 	}, nil
 }
 
-func (h *UserHandler) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.RefreshTokenResponse, error) {
+func (h *Handler) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.RefreshTokenResponse, error) {
 	claims, err := auth.ValidateRefreshToken(req.RefreshToken, "secretKey")
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid refresh token")
 	}
 
-	userID, ok := claims["user_id"].(string)
+	userID, ok := claims["userId"].(string)
 	if !ok {
 		return nil, status.Errorf(codes.Internal, "Invalid refresh token")
 	}
 
-	user, err := h.userService.GetUserByID(userID)
+	user, err := h.service.GetUserByID(userID)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "User not found")
 	}

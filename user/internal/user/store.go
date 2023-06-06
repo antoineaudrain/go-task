@@ -1,25 +1,35 @@
-package store
+package user
 
 import (
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"go-task/user/pkg/models"
+	"go-task/core/pkg/models"
 )
 
-type UserStore struct {
-	db *pgxpool.Pool
-}
+type (
+	store struct {
+		db *pgxpool.Pool
+	}
 
-func NewUserStore(connStr string) (*UserStore, error) {
+	Store interface {
+		CreateUser(user *models.User) error
+		GetUserByEmail(email string) (*models.User, error)
+		GetUserByID(userID string) (*models.User, error)
+	}
+)
+
+var _ Store = (*store)(nil)
+
+func NewStore(connStr string) (Store, error) {
 	db, err := pgxpool.Connect(context.Background(), connStr)
 	if err != nil {
 		return nil, err
 	}
 
-	return &UserStore{db: db}, nil
+	return &store{db: db}, nil
 }
 
-func (s *UserStore) CreateUser(user *models.User) error {
+func (s *store) CreateUser(user *models.User) error {
 	sqlStatement := `
 		INSERT INTO users (id, email, password_hash, full_name)
 		VALUES ($1, $2, $3, $4)
@@ -33,7 +43,7 @@ func (s *UserStore) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (s *UserStore) GetUserByEmail(email string) (*models.User, error) {
+func (s *store) GetUserByEmail(email string) (*models.User, error) {
 	sqlStatement := `
 		SELECT id, email, password_hash, full_name
 		FROM users
@@ -52,7 +62,7 @@ func (s *UserStore) GetUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (s *UserStore) GetUserByID(userID string) (*models.User, error) {
+func (s *store) GetUserByID(userID string) (*models.User, error) {
 	sqlStatement := `
 		SELECT id, email, password_hash, full_name
 		FROM users

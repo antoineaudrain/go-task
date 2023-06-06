@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"go-task/core/pkg/logger"
-	"go-task/user/internal/handler"
+	"go-task/user/internal/user"
 	"google.golang.org/grpc"
 	"net"
 )
@@ -25,7 +25,7 @@ func (s *Server) Run() error {
 
 	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(interceptor))
 
-	_handler := handler.NewHandler()
+	_handler := user.NewHandler()
 	_handler.Register(s.grpcServer)
 
 	logger.Info("Server started and listening on :50051")

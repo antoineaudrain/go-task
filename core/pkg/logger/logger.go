@@ -13,11 +13,11 @@ var (
 	logger *zap.Logger
 )
 
-func Init(namespace string, debug bool) {
+func Init(namespace string) {
 	var core zapcore.Core
 	logFilename := fmt.Sprintf("logs/%s.log", namespace)
 
-	if debug {
+	if os.Getenv("ENV") != "production" {
 		consoleConfig := zap.NewDevelopmentEncoderConfig()
 		consoleEncoder := zapcore.NewConsoleEncoder(consoleConfig)
 		core = zapcore.NewCore(consoleEncoder, zapcore.Lock(os.Stdout), zap.DebugLevel)

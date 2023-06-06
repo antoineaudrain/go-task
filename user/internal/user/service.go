@@ -1,10 +1,9 @@
-package service
+package user
 
 import (
 	"github.com/google/uuid"
+	"go-task/core/pkg/models"
 	"go-task/user/internal/event"
-	"go-task/user/internal/store"
-	"go-task/user/pkg/models"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -12,31 +11,34 @@ import (
 	"os"
 )
 
-type UserService struct {
-	userStore *store.UserStore
-}
+type (
+	service struct {
+		store Store
+	}
 
-type Service interface {
-	Create(email, password, fullName string) (*models.User, error)
-	Authenticate(email, password string) (*models.User, error)
-	HashPassword(password string) (string, error)
-	CheckPasswordHash(password, hash string) bool
-}
+	Service interface {
+		Create(email, password, fullName string) (*models.User, error)
+		Authenticate(email, password string) (*models.User, error)
+		GetUserByID(userID string) (*models.User, error)
+		HashPassword(password string) (string, error)
+		CheckPasswordHash(password, hash string) bool
+	}
+)
 
-var _ Service = (*UserService)(nil)
+var _ Service = (*service)(nil)
 
-func NewUserService() *UserService {
-	userStore, err := store.NewUserStore(os.Getenv("DATABASE_URL"))
+func NewService() Service {
+	s, err := NewStore(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatalf("Failed to create user store: %v", err)
 	}
 
-	return &UserService{
-		userStore: userStore,
+	return &service{
+		store: s,
 	}
 }
 
-func (s *UserService) Create(email, password, fullName string) (*models.User, error) {
+func (s *service) Create(email, password, fullName string) (*models.User, error) {
 	hashedPassword, err := s.HashPassword(password)
 	if err != nil {
 		return nil, err
@@ -49,7 +51,7 @@ func (s *UserService) Create(email, password, fullName string) (*models.User, er
 		FullName:     fullName,
 	}
 
-	if err := s.userStore.CreateUser(user); err != nil {
+	if err := s.store.CreateUser(user); err != nil {
 		return nil, err
 	}
 
@@ -59,8 +61,8 @@ func (s *UserService) Create(email, password, fullName string) (*models.User, er
 	return user, nil
 }
 
-func (s *UserService) Authenticate(email, password string) (*models.User, error) {
-	user, err := s.userStore.GetUserByEmail(email)
+func (s *service) Authenticate(email, password string) (*models.User, error) {
+	user, err := s.store.GetUserByEmail(email)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
 	}
@@ -73,8 +75,8 @@ func (s *UserService) Authenticate(email, password string) (*models.User, error)
 	return user, nil
 }
 
-func (s *UserService) GetUserByID(userID string) (*models.User, error) {
-	user, err := s.userStore.GetUserByID(userID)
+func (s *service) GetUserByID(userID string) (*models.User, error) {
+	user, err := s.store.GetUserByID(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -82,12 +84,12 @@ func (s *UserService) GetUserByID(userID string) (*models.User, error) {
 	return user, nil
 }
 
-func (s *UserService) HashPassword(password string) (string, error) {
+func (s *service) HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
-func (s *UserService) CheckPasswordHash(password, passwordHash string) bool {
+func (s *service) CheckPasswordHash(password, passwordHash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
 	return err == nil
 }
