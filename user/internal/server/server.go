@@ -22,7 +22,8 @@ func (s *Server) Run() error {
 		logger.Error("failed to listen", err)
 		return err
 	}
-	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(loggingInterceptor))
+
+	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(interceptor))
 
 	_handler := handler.NewHandler()
 	_handler.Register(s.grpcServer)
@@ -44,7 +45,7 @@ func (s *Server) Stop() {
 	}
 }
 
-func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func interceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	logger.Info("Received request", info.FullMethod)
 	return handler(ctx, req)
 }

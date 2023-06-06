@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"go-task/core/pkg/logger"
-	"go-task/workspace/internal/handler"
+	"go-task/workspace/internal/workspace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"net"
+	"os"
 	"strings"
 	"time"
 )
@@ -32,7 +33,7 @@ func (s *Server) Run() error {
 
 	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(interceptor))
 
-	_handler := handler.NewHandler()
+	_handler := workspace.NewHandler()
 	_handler.Register(s.grpcServer)
 
 	logger.Info("Server started and listening on :50051")
@@ -98,7 +99,7 @@ func decodeAccessToken(accessToken string) (string, error) {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte("secretKey"), nil
+		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to parse access token: %v", err)
@@ -110,6 +111,7 @@ func decodeAccessToken(accessToken string) (string, error) {
 	}
 
 	expirationTime := time.Unix(int64(claims["exp"].(float64)), 0)
+	fmt.Println(expirationTime)
 	if time.Now().After(expirationTime) {
 		return "", fmt.Errorf("access token has expired")
 	}
