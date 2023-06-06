@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
+	"os"
 )
 
 type UserService struct {
@@ -24,7 +25,7 @@ type Service interface {
 var _ Service = (*UserService)(nil)
 
 func NewUserService() *UserService {
-	store, err := postgres.NewUserStore("postgresql://go_task:go_task@localhost:5432/user_db")
+	store, err := postgres.NewUserStore(os.Getenv("GOOSE_DBSTRING"))
 	if err != nil {
 		log.Fatalf("Failed to create user store: %v", err)
 	}

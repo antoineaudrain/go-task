@@ -5,6 +5,7 @@ import (
 	"go-task/workspace/internal/store/postgres"
 	"go-task/workspace/pkg/models"
 	"log"
+	"os"
 )
 
 type WorkspaceService struct {
@@ -18,7 +19,7 @@ type Service interface {
 var _ Service = (*WorkspaceService)(nil)
 
 func NewWorkspaceService() *WorkspaceService {
-	store, err := postgres.NewWorkspaceStore("postgresql://go_task:go_task@localhost:5433/workspace_db")
+	store, err := postgres.NewWorkspaceStore(os.Getenv("GOOSE_DBSTRING"))
 	if err != nil {
 		log.Fatalf("Failed to create user store: %v", err)
 	}
