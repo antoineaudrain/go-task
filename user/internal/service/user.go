@@ -42,19 +42,19 @@ func (s *UserService) Create(email, password, fullName string) (*models.User, er
 	}
 
 	user := &models.User{
-		ID:       uuid.New(),
-		Email:    email,
-		Password: hashedPassword,
-		FullName: fullName,
+		ID:           uuid.New(),
+		Email:        email,
+		PasswordHash: hashedPassword,
+		FullName:     fullName,
 	}
 
 	if err := s.userStore.CreateUser(user); err != nil {
 		return nil, err
 	}
 
-	event.PublishUserCreated(user.ID.String(), user.Email, user.Password)
+	event.PublishUserCreated(user.ID.String(), user.Email, user.PasswordHash)
 
-	user.Password = "" // Don't return hashed password
+	user.PasswordHash = "" // Don't return hashed password
 	return user, nil
 }
 
@@ -64,7 +64,7 @@ func (s *UserService) GetUserByEmail(email, password string) (*models.User, erro
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
 	}

@@ -5,11 +5,13 @@ import (
 	pb "go-task/user/api"
 	"go-task/user/internal/service"
 	"go-task/user/internal/store/postgres"
+	"google.golang.org/grpc"
 )
 
 //go:generate mockery --name Service --inpackage-suffix --output ../mocks --case underscore --with-expecter
 type (
 	Server struct {
+		grpcServer *grpc.Server
 	}
 
 	Handler struct {

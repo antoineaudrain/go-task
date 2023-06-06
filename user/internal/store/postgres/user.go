@@ -21,11 +21,11 @@ func NewUserStore(connStr string) (*UserStore, error) {
 
 func (s *UserStore) CreateUser(user *models.User) error {
 	sqlStatement := `
-		INSERT INTO users (id, email, password, full_name)
+		INSERT INTO users (id, email, password_hash, full_name)
 		VALUES ($1, $2, $3, $4)
 	`
 
-	_, err := s.db.Exec(context.Background(), sqlStatement, user.ID, user.Email, user.Password, user.FullName)
+	_, err := s.db.Exec(context.Background(), sqlStatement, user.ID, user.Email, user.PasswordHash, user.FullName)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (s *UserStore) CreateUser(user *models.User) error {
 
 func (s *UserStore) GetUserByEmail(email string) (*models.User, error) {
 	sqlStatement := `
-		SELECT id, email, password, full_name
+		SELECT id, email, password_hash, full_name
 		FROM users
 		WHERE email = $1
 		LIMIT 1
@@ -44,7 +44,7 @@ func (s *UserStore) GetUserByEmail(email string) (*models.User, error) {
 	row := s.db.QueryRow(context.Background(), sqlStatement, email)
 
 	var user models.User
-	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.FullName)
+	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash, &user.FullName)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (s *UserStore) GetUserByEmail(email string) (*models.User, error) {
 
 func (s *UserStore) GetUserByID(userID string) (*models.User, error) {
 	sqlStatement := `
-		SELECT id, email, password, full_name
+		SELECT id, email, password_hash, full_name
 		FROM users
 		WHERE id = $1
 		LIMIT 1
@@ -63,7 +63,7 @@ func (s *UserStore) GetUserByID(userID string) (*models.User, error) {
 	row := s.db.QueryRow(context.Background(), sqlStatement, userID)
 
 	var user models.User
-	err := row.Scan(&user.ID, &user.Email, &user.Password, &user.FullName)
+	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash, &user.FullName)
 	if err != nil {
 		return nil, err
 	}
