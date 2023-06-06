@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	logger.Init(os.Getenv("MODE") != "production")
+	logger.Init("workspace", os.Getenv("ENV") != "production")
 	defer logger.Close()
 
 	s := server.NewServer()

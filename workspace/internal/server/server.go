@@ -17,19 +17,19 @@ func NewServer() *Server {
 }
 
 func (s *Server) Run() error {
-	lis, err := net.Listen("tcp", ":50052")
+	conn, err := net.Listen("tcp", ":50052")
 	if err != nil {
 		logger.Error("failed to listen", err)
 		return err
 	}
 	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(loggingInterceptor))
 
-	workspaceHandler := handler.NewHandler()
-	workspaceHandler.Register(s.grpcServer)
+	_handler := handler.NewHandler()
+	_handler.Register(s.grpcServer)
 
 	logger.Info("Server started and listening on :50051")
 
-	if err := s.grpcServer.Serve(lis); err != nil {
+	if err := s.grpcServer.Serve(conn); err != nil {
 		logger.Error("failed to serve", err)
 		return err
 	}

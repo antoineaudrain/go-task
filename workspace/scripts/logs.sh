@@ -1,2 +1,2 @@
 #!/bin/bash
-tail -f logs/user.log
+tail -f logs/workspace.log

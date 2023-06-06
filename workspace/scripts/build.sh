@@ -1,2 +1,2 @@
 #!/bin/bash
-go build -o user ./cmd/main
+go build -o workspace ./cmd/main

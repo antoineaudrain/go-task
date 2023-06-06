@@ -13,15 +13,17 @@ var (
 	logger *zap.Logger
 )
 
-func Init(debug bool) {
+func Init(namespace string, debug bool) {
 	var core zapcore.Core
+	logFilename := fmt.Sprintf("logs/%s.log", namespace)
+
 	if debug {
 		consoleConfig := zap.NewDevelopmentEncoderConfig()
 		consoleEncoder := zapcore.NewConsoleEncoder(consoleConfig)
 		core = zapcore.NewCore(consoleEncoder, zapcore.Lock(os.Stdout), zap.DebugLevel)
 	} else {
 		w := zapcore.AddSync(&lumberjack.Logger{
-			Filename:   "user-service.log",
+			Filename:   logFilename,
 			MaxSize:    500,
 			MaxBackups: 3,
 			MaxAge:     28,
