@@ -20,15 +20,15 @@ func main() {
 	//	FullName: "John Doe",
 	//})
 
-	user, err := client.Login(context.Background(), &pb.LoginRequest{
-		Email:    "johndoe@example.com",
-		Password: "password",
-	})
-
-	//refreshToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODYwNzIxNDEsInVzZXJfaWQiOiJjNmM5ZThhNS0wNWYzLTQ1OWQtOTBlNS1iYWRmYWJkNjRkYzUifQ.5y01xPxawpPpG92t9rN4ljszWjlUL6vRAaepZFPN594"
-	//user, err := client.RefreshToken(context.Background(), &pb.RefreshTokenRequest{
-	//	RefreshToken: refreshToken,
+	//user, err := client.Login(context.Background(), &pb.LoginRequest{
+	//	Email:    "johndoe@example.com",
+	//	Password: "password",
 	//})
+
+	refreshToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODYxNDE1ODUsInVzZXJfaWQiOiJkNjNjNTRhOS00ZTk3LTQ0MzAtYjA4NC1kNmZiOGEzN2IzYTcifQ.aVfKr0r6TKjFo7hG3p3N92IVKqOwT1LE51Qo_tQ0lcs"
+	user, err := client.RefreshToken(context.Background(), &pb.RefreshTokenRequest{
+		RefreshToken: refreshToken,
+	})
 
 	if err != nil {
 		fmt.Println(err)

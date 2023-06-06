@@ -15,7 +15,7 @@ func GenerateAccessToken(userID string, secretKey string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["user_id"] = userID
+	claims["userId"] = userID
 	claims["exp"] = time.Now().Add(accessTokenExpireDuration).Unix()
 
 	tokenString, err := token.SignedString([]byte(secretKey))
