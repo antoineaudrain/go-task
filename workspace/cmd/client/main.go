@@ -23,7 +23,7 @@ func main() {
 
 	client := pb.NewWorkspaceServiceClient(conn)
 
-	accessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODYwNTYxMzcsInVzZXJJZCI6ImQ2M2M1NGE5LTRlOTctNDQzMC1iMDg0LWQ2ZmI4YTM3YjNhNyJ9.DSstGMaMPg1yW3T_715gKcIOk1H7gItYK6yy4jihryA"
+	accessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODYxMzg1NzgsInN1YiI6IjQ5NmI5MWQyLWFlOTMtNDczZi04OTIzLTYyZDM5NTFkYmNjMCIsInRva2VuVHlwZSI6ImFjY2VzcyJ9.NwnB2YdArCeAM3JQRqHCtr7MfM8P0nAtHO70TOtZSRo"
 	res, err := client.Create(
 		metadata.AppendToOutgoingContext(context.Background(), "authorization", "Bearer "+accessToken),
 		&pb.CreateRequest{

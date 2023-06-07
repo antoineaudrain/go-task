@@ -5,10 +5,10 @@ option go_package = "go-task/workspace";
 package workspace;
 
 service WorkspaceService {
-  rpc Create(CreateRequest) returns (CreateResponse) {}
+  rpc CreateWorkspace(CreateWorkspaceRequest) returns (CreateWorkspaceResponse) {}
 }
 
-message CreateRequest {
+message CreateWorkspaceRequest {
   string name = 1;
 }
 
@@ -18,6 +18,6 @@ message Workspace {
   string description = 3;
 }
 
-message CreateResponse {
+message CreateWorkspaceResponse {
   Workspace workspace = 1;
 }

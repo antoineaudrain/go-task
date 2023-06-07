@@ -12,7 +12,7 @@ func main() {
 	logger.Init("user")
 	defer logger.Close()
 
-	s := server.NewServer()
+	s := server.NewServer(os.Getenv("PORT"))
 
 	go func() {
 		if err := s.Run(); err != nil {
@@ -22,12 +22,13 @@ func main() {
 
 	waitForTerminationSignal()
 
-	s.Stop()
+	s.Shutdown()
 }
 
 func waitForTerminationSignal() {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 	<-signalChan
-	logger.Error("Termination signal received. Shutting down gracefully.")
+
+	logger.Info("Shutting down server gracefully...")
 }

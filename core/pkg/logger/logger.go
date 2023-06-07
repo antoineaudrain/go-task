@@ -45,6 +45,10 @@ func Close() {
 	_ = logger.Sync()
 }
 
+func Debug(message string, args ...interface{}) {
+	logger.Debug(fmt.Sprintf(message, args...))
+}
+
 func Info(message string, args ...interface{}) {
 	logger.Info(fmt.Sprintf(message, args...))
 }

@@ -2,11 +2,10 @@ package user
 
 import (
 	"github.com/google/uuid"
+	customErrors "go-task/core/pkg/errors"
 	"go-task/core/pkg/models"
 	"go-task/user/internal/event"
 	"golang.org/x/crypto/bcrypt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"log"
 	"os"
 )
@@ -17,11 +16,8 @@ type (
 	}
 
 	Service interface {
-		Create(email, password, fullName string) (*models.User, error)
-		Authenticate(email, password string) (*models.User, error)
-		GetUserByID(userID string) (*models.User, error)
-		HashPassword(password string) (string, error)
-		CheckPasswordHash(password, hash string) bool
+		CreateUserWithHashedPassword(email, password, fullName string) (*models.User, error)
+		AuthenticateUser(email, password string) (*models.User, error)
 	}
 )
 
@@ -38,10 +34,10 @@ func NewService() Service {
 	}
 }
 
-func (s *service) Create(email, password, fullName string) (*models.User, error) {
-	hashedPassword, err := s.HashPassword(password)
+func (s *service) CreateUserWithHashedPassword(email, password, fullName string) (*models.User, error) {
+	hashedPassword, err := hashPassword(password)
 	if err != nil {
-		return nil, err
+		return nil, customErrors.NewHashingError("failed to hash password", err)
 	}
 
 	user := &models.User{
@@ -52,44 +48,35 @@ func (s *service) Create(email, password, fullName string) (*models.User, error)
 	}
 
 	if err := s.store.CreateUser(user); err != nil {
-		return nil, err
+		return nil, customErrors.NewDatabaseError("failed to create user", err)
 	}
 
-	event.PublishUserCreated(user.ID.String(), user.Email, user.PasswordHash)
+	event.PublishUserCreated(user.ID.String(), user.Email, user.FullName)
 
-	user.PasswordHash = "" // Don't return hashed password
+	user.PasswordHash = ""
 	return user, nil
 }
 
-func (s *service) Authenticate(email, password string) (*models.User, error) {
+func (s *service) AuthenticateUser(email, password string) (*models.User, error) {
 	user, err := s.store.GetUserByEmail(email)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
+		return nil, customErrors.NewAuthenticationError("Invalid email or password", err)
 	}
 
-	valid := s.CheckPasswordHash(user.PasswordHash, password)
+	valid := checkPasswordHash(password, user.PasswordHash)
 	if valid != true {
-		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
+		return nil, customErrors.NewAuthenticationError("Invalid email or password", err)
 	}
 
 	return user, nil
 }
 
-func (s *service) GetUserByID(userID string) (*models.User, error) {
-	user, err := s.store.GetUserByID(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
-func (s *service) HashPassword(password string) (string, error) {
+func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
-func (s *service) CheckPasswordHash(password, passwordHash string) bool {
+func checkPasswordHash(password, passwordHash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
 	return err == nil
 }

@@ -3,40 +3,39 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/golang-jwt/jwt"
+	"go-task/core/pkg/auth"
 	"go-task/core/pkg/logger"
+	pb "go-task/user/api"
 	"go-task/workspace/internal/workspace"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 	"net"
-	"os"
-	"strings"
-	"time"
 )
 
 type Server struct {
 	grpcServer *grpc.Server
+	userClient pb.UserServiceClient
+	port       string
 }
 
-func NewServer() *Server {
-	return &Server{}
+func NewServer(port string) *Server {
+	return &Server{
+		port: port,
+	}
 }
 
 func (s *Server) Run() error {
-	conn, err := net.Listen("tcp", ":50052")
+	conn, err := net.Listen("tcp", fmt.Sprintf(":%s", s.port))
 	if err != nil {
-		logger.Error("failed to listen", err)
+		logger.Error(fmt.Sprintf("failed to listen on port %s", s.port), err)
 		return err
 	}
 
-	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(interceptor))
+	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(s.interceptor))
 
-	_handler := workspace.NewHandler()
-	_handler.Register(s.grpcServer)
+	workspaceHandler := workspace.NewHandler()
+	workspaceHandler.Register(s.grpcServer)
 
-	logger.Info("Server started and listening on :50051")
+	logger.Info(fmt.Sprintf("Server started and listening on %s", conn.Addr().String()))
 
 	if err := s.grpcServer.Serve(conn); err != nil {
 		logger.Error("failed to serve", err)
@@ -46,80 +45,17 @@ func (s *Server) Run() error {
 	return nil
 }
 
-func (s *Server) Stop() {
+func (s *Server) Shutdown() {
 	if s.grpcServer != nil {
 		s.grpcServer.GracefulStop()
-		logger.Info("Server stopped")
+		logger.Info("Server stopped gracefully.")
 	}
 }
 
-func interceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (s *Server) interceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	logger.Info("Received request", info.FullMethod)
 
-	accessToken, err := extractAccessTokenFromMetadata(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-	if accessToken == "" {
-		return nil, status.Error(codes.Unauthenticated, "access token is missing")
-	}
-
-	userId, err := decodeAccessToken(accessToken)
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, err.Error())
-	}
-
-	ctx = context.WithValue(ctx, "userId", userId)
+	accessToken := auth.ExtractAccessTokenFromContext(ctx)
+	ctx = context.WithValue(ctx, "accessToken", accessToken)
 	return handler(ctx, req)
-}
-
-func extractAccessTokenFromMetadata(ctx context.Context) (string, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return "", fmt.Errorf("failed to get metadata from context")
-	}
-
-	authorizationHeader := md.Get("authorization")
-	if len(authorizationHeader) == 0 {
-		return "", fmt.Errorf("authorization header is missing")
-	}
-
-	authValue := strings.TrimSpace(authorizationHeader[0])
-	if !strings.HasPrefix(authValue, "Bearer ") {
-		return "", fmt.Errorf("invalid authorization header format")
-	}
-
-	accessToken := strings.TrimPrefix(authValue, "Bearer ")
-	return accessToken, nil
-}
-
-func decodeAccessToken(accessToken string) (string, error) {
-	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return []byte(os.Getenv("SECRET_KEY")), nil
-	})
-	if err != nil {
-		return "", fmt.Errorf("failed to parse access token: %v", err)
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return "", fmt.Errorf("invalid access token")
-	}
-
-	expirationTime := time.Unix(int64(claims["exp"].(float64)), 0)
-	fmt.Println(expirationTime)
-	if time.Now().After(expirationTime) {
-		return "", fmt.Errorf("access token has expired")
-	}
-
-	userId, ok := claims["userId"].(string)
-	if !ok {
-		return "", fmt.Errorf("invalid userId claim in access token")
-	}
-
-	return userId, nil
 }

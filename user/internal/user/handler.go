@@ -3,11 +3,11 @@ package user
 import (
 	"context"
 	"go-task/core/pkg/auth"
+	customErrors "go-task/core/pkg/errors"
 	pb "go-task/user/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"os"
 )
 
 type Handler struct {
@@ -25,38 +25,45 @@ func (h *Handler) Register(s *grpc.Server) {
 	pb.RegisterUserServiceServer(s, h)
 }
 
-func (h *Handler) Create(ctx context.Context, req *pb.CreateRequest) (*pb.CreateResponse, error) {
-	user, err := h.service.Create(req.GetEmail(), req.GetPassword(), req.GetFullName())
+func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	user, err := h.service.CreateUserWithHashedPassword(req.GetEmail(), req.GetPassword(), req.GetFullName())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Internal error")
+		switch err := err.(type) {
+		case *customErrors.DatabaseError:
+			return nil, status.Errorf(codes.Internal, "Failed to create user: %v", err)
+		default:
+			return nil, status.Errorf(codes.Internal, "Unexpected error: %v", err)
+		}
 	}
 
-	return &pb.CreateResponse{
+	createResponse := &pb.CreateUserResponse{
 		User: &pb.User{
 			Id:       user.ID.String(),
 			Email:    user.Email,
 			FullName: user.FullName,
 		},
-	}, nil
+	}
+
+	return createResponse, nil
 }
 
 func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	user, err := h.service.Authenticate(req.GetEmail(), req.GetPassword())
+	user, err := h.service.AuthenticateUser(req.GetEmail(), req.GetPassword())
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password")
+		return nil, status.Errorf(codes.Unauthenticated, "Invalid email or password: %v", err)
 	}
 
-	accessToken, err := auth.GenerateAccessToken(user.ID.String(), os.Getenv("SECRET_KEY"))
+	refreshToken, err := auth.GenerateRefreshToken(user.ID.String())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to generate access token")
+		return nil, status.Errorf(codes.Internal, "Failed to generate refresh token: %v", err)
 	}
 
-	refreshToken, err := auth.GenerateRefreshToken(user.ID.String(), os.Getenv("SECRET_KEY"))
+	accessToken, err := auth.GenerateAccessToken(refreshToken)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to generate refresh token")
+		return nil, status.Errorf(codes.Internal, "Failed to generate access token: %v", err)
 	}
 
-	return &pb.LoginResponse{
+	loginResponse := &pb.LoginResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		User: &pb.User{
@@ -64,29 +71,18 @@ func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginRes
 			Email:    user.Email,
 			FullName: user.FullName,
 		},
-	}, nil
+	}
+
+	return loginResponse, nil
 }
 
-func (h *Handler) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.RefreshTokenResponse, error) {
-	claims, err := auth.ValidateRefreshToken(req.RefreshToken, "secretKey")
+func (h *Handler) RefreshAccessToken(ctx context.Context, req *pb.RefreshAccessTokenRequest) (*pb.RefreshAccessTokenResponse, error) {
+	accessToken, err := auth.GenerateAccessToken(req.GetRefreshToken())
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "Invalid refresh token")
+		return nil, status.Errorf(codes.Internal, "Failed to generate access token: %v", err)
 	}
 
-	userID, ok := claims["userId"].(string)
-	if !ok {
-		return nil, status.Errorf(codes.Internal, "Invalid refresh token")
-	}
+	refreshTokenResponse := &pb.RefreshAccessTokenResponse{AccessToken: accessToken}
 
-	user, err := h.service.GetUserByID(userID)
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "User not found")
-	}
-
-	accessToken, err := auth.GenerateAccessToken(user.ID.String(), "secretKey")
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to generate access token")
-	}
-
-	return &pb.RefreshTokenResponse{AccessToken: accessToken}, nil
+	return refreshTokenResponse, nil
 }

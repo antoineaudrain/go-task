@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"context"
+	"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go-task/core/pkg/models"
 )
@@ -13,6 +14,7 @@ type (
 
 	Store interface {
 		CreateWorkspace(workspace *models.Workspace) error
+		CreateWorkspaceUser(workspaceUser *models.WorkspaceUser) error
 	}
 )
 
@@ -34,6 +36,21 @@ func (s *store) CreateWorkspace(workspace *models.Workspace) error {
 	`
 
 	_, err := s.db.Exec(context.Background(), sqlStatement, workspace.ID, workspace.Name)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *store) CreateWorkspaceUser(workspaceUser *models.WorkspaceUser) error {
+	sqlStatement := `
+		INSERT INTO workspace_users (id, workspace_id, user_id, status)
+		VALUES ($1, $2, $3, $4)
+	`
+
+	_, err := s.db.Exec(context.Background(), sqlStatement, workspaceUser.ID, workspaceUser.WorkspaceID, workspaceUser.UserID, workspaceUser.Status)
+	fmt.Println(err)
 	if err != nil {
 		return err
 	}

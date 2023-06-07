@@ -21,8 +21,8 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// Authenticate provides a mock function with given fields: email, password
-func (_m *Service) Authenticate(email string, password string) (*models.User, error) {
+// AuthenticateUser provides a mock function with given fields: email, password
+func (_m *Service) AuthenticateUser(email string, password string) (*models.User, error) {
 	ret := _m.Called(email, password)
 
 	var r0 *models.User
@@ -47,80 +47,37 @@ func (_m *Service) Authenticate(email string, password string) (*models.User, er
 	return r0, r1
 }
 
-// Service_Authenticate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Authenticate'
-type Service_Authenticate_Call struct {
+// Service_AuthenticateUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AuthenticateUser'
+type Service_AuthenticateUser_Call struct {
 	*mock.Call
 }
 
-// Authenticate is a helper method to define mock.On call
+// AuthenticateUser is a helper method to define mock.On call
 //   - email string
 //   - password string
-func (_e *Service_Expecter) Authenticate(email interface{}, password interface{}) *Service_Authenticate_Call {
-	return &Service_Authenticate_Call{Call: _e.mock.On("Authenticate", email, password)}
+func (_e *Service_Expecter) AuthenticateUser(email interface{}, password interface{}) *Service_AuthenticateUser_Call {
+	return &Service_AuthenticateUser_Call{Call: _e.mock.On("AuthenticateUser", email, password)}
 }
 
-func (_c *Service_Authenticate_Call) Run(run func(email string, password string)) *Service_Authenticate_Call {
+func (_c *Service_AuthenticateUser_Call) Run(run func(email string, password string)) *Service_AuthenticateUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(string), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *Service_Authenticate_Call) Return(_a0 *models.User, _a1 error) *Service_Authenticate_Call {
+func (_c *Service_AuthenticateUser_Call) Return(_a0 *models.User, _a1 error) *Service_AuthenticateUser_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Service_Authenticate_Call) RunAndReturn(run func(string, string) (*models.User, error)) *Service_Authenticate_Call {
+func (_c *Service_AuthenticateUser_Call) RunAndReturn(run func(string, string) (*models.User, error)) *Service_AuthenticateUser_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// CheckPasswordHash provides a mock function with given fields: password, hash
-func (_m *Service) CheckPasswordHash(password string, hash string) bool {
-	ret := _m.Called(password, hash)
-
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
-		r0 = rf(password, hash)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	return r0
-}
-
-// Service_CheckPasswordHash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckPasswordHash'
-type Service_CheckPasswordHash_Call struct {
-	*mock.Call
-}
-
-// CheckPasswordHash is a helper method to define mock.On call
-//   - password string
-//   - hash string
-func (_e *Service_Expecter) CheckPasswordHash(password interface{}, hash interface{}) *Service_CheckPasswordHash_Call {
-	return &Service_CheckPasswordHash_Call{Call: _e.mock.On("CheckPasswordHash", password, hash)}
-}
-
-func (_c *Service_CheckPasswordHash_Call) Run(run func(password string, hash string)) *Service_CheckPasswordHash_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *Service_CheckPasswordHash_Call) Return(_a0 bool) *Service_CheckPasswordHash_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Service_CheckPasswordHash_Call) RunAndReturn(run func(string, string) bool) *Service_CheckPasswordHash_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Create provides a mock function with given fields: email, password, fullName
-func (_m *Service) Create(email string, password string, fullName string) (*models.User, error) {
+// CreateUserWithHashedPassword provides a mock function with given fields: email, password, fullName
+func (_m *Service) CreateUserWithHashedPassword(email string, password string, fullName string) (*models.User, error) {
 	ret := _m.Called(email, password, fullName)
 
 	var r0 *models.User
@@ -145,138 +102,32 @@ func (_m *Service) Create(email string, password string, fullName string) (*mode
 	return r0, r1
 }
 
-// Service_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
-type Service_Create_Call struct {
+// Service_CreateUserWithHashedPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateUserWithHashedPassword'
+type Service_CreateUserWithHashedPassword_Call struct {
 	*mock.Call
 }
 
-// Create is a helper method to define mock.On call
+// CreateUserWithHashedPassword is a helper method to define mock.On call
 //   - email string
 //   - password string
 //   - fullName string
-func (_e *Service_Expecter) Create(email interface{}, password interface{}, fullName interface{}) *Service_Create_Call {
-	return &Service_Create_Call{Call: _e.mock.On("Create", email, password, fullName)}
+func (_e *Service_Expecter) CreateUserWithHashedPassword(email interface{}, password interface{}, fullName interface{}) *Service_CreateUserWithHashedPassword_Call {
+	return &Service_CreateUserWithHashedPassword_Call{Call: _e.mock.On("CreateUserWithHashedPassword", email, password, fullName)}
 }
 
-func (_c *Service_Create_Call) Run(run func(email string, password string, fullName string)) *Service_Create_Call {
+func (_c *Service_CreateUserWithHashedPassword_Call) Run(run func(email string, password string, fullName string)) *Service_CreateUserWithHashedPassword_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(string), args[1].(string), args[2].(string))
 	})
 	return _c
 }
 
-func (_c *Service_Create_Call) Return(_a0 *models.User, _a1 error) *Service_Create_Call {
+func (_c *Service_CreateUserWithHashedPassword_Call) Return(_a0 *models.User, _a1 error) *Service_CreateUserWithHashedPassword_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Service_Create_Call) RunAndReturn(run func(string, string, string) (*models.User, error)) *Service_Create_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetUserByID provides a mock function with given fields: userID
-func (_m *Service) GetUserByID(userID string) (*models.User, error) {
-	ret := _m.Called(userID)
-
-	var r0 *models.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*models.User, error)); ok {
-		return rf(userID)
-	}
-	if rf, ok := ret.Get(0).(func(string) *models.User); ok {
-		r0 = rf(userID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.User)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(userID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Service_GetUserByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserByID'
-type Service_GetUserByID_Call struct {
-	*mock.Call
-}
-
-// GetUserByID is a helper method to define mock.On call
-//   - userID string
-func (_e *Service_Expecter) GetUserByID(userID interface{}) *Service_GetUserByID_Call {
-	return &Service_GetUserByID_Call{Call: _e.mock.On("GetUserByID", userID)}
-}
-
-func (_c *Service_GetUserByID_Call) Run(run func(userID string)) *Service_GetUserByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Service_GetUserByID_Call) Return(_a0 *models.User, _a1 error) *Service_GetUserByID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Service_GetUserByID_Call) RunAndReturn(run func(string) (*models.User, error)) *Service_GetUserByID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// HashPassword provides a mock function with given fields: password
-func (_m *Service) HashPassword(password string) (string, error) {
-	ret := _m.Called(password)
-
-	var r0 string
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (string, error)); ok {
-		return rf(password)
-	}
-	if rf, ok := ret.Get(0).(func(string) string); ok {
-		r0 = rf(password)
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(password)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Service_HashPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HashPassword'
-type Service_HashPassword_Call struct {
-	*mock.Call
-}
-
-// HashPassword is a helper method to define mock.On call
-//   - password string
-func (_e *Service_Expecter) HashPassword(password interface{}) *Service_HashPassword_Call {
-	return &Service_HashPassword_Call{Call: _e.mock.On("HashPassword", password)}
-}
-
-func (_c *Service_HashPassword_Call) Run(run func(password string)) *Service_HashPassword_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Service_HashPassword_Call) Return(_a0 string, _a1 error) *Service_HashPassword_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Service_HashPassword_Call) RunAndReturn(run func(string) (string, error)) *Service_HashPassword_Call {
+func (_c *Service_CreateUserWithHashedPassword_Call) RunAndReturn(run func(string, string, string) (*models.User, error)) *Service_CreateUserWithHashedPassword_Call {
 	_c.Call.Return(run)
 	return _c
 }

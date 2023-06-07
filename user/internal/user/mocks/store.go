@@ -117,60 +117,6 @@ func (_c *Store_GetUserByEmail_Call) RunAndReturn(run func(string) (*models.User
 	return _c
 }
 
-// GetUserByID provides a mock function with given fields: userID
-func (_m *Store) GetUserByID(userID string) (*models.User, error) {
-	ret := _m.Called(userID)
-
-	var r0 *models.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*models.User, error)); ok {
-		return rf(userID)
-	}
-	if rf, ok := ret.Get(0).(func(string) *models.User); ok {
-		r0 = rf(userID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.User)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(userID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Store_GetUserByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserByID'
-type Store_GetUserByID_Call struct {
-	*mock.Call
-}
-
-// GetUserByID is a helper method to define mock.On call
-//   - userID string
-func (_e *Store_Expecter) GetUserByID(userID interface{}) *Store_GetUserByID_Call {
-	return &Store_GetUserByID_Call{Call: _e.mock.On("GetUserByID", userID)}
-}
-
-func (_c *Store_GetUserByID_Call) Run(run func(userID string)) *Store_GetUserByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Store_GetUserByID_Call) Return(_a0 *models.User, _a1 error) *Store_GetUserByID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Store_GetUserByID_Call) RunAndReturn(run func(string) (*models.User, error)) *Store_GetUserByID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 type mockConstructorTestingTNewStore interface {
 	mock.TestingT
 	Cleanup(func())

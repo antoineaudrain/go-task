@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"github.com/google/uuid"
+	customErrors "go-task/core/pkg/errors"
 	"go-task/core/pkg/models"
 	"log"
 	"os"
@@ -13,7 +14,7 @@ type (
 	}
 
 	Service interface {
-		Create(name string) (*models.Workspace, error)
+		CreateWorkspaceWithUser(name string, userId uuid.UUID) (*models.Workspace, error)
 	}
 )
 
@@ -30,14 +31,25 @@ func NewService() Service {
 	}
 }
 
-func (s *service) Create(name string) (*models.Workspace, error) {
+func (s *service) CreateWorkspaceWithUser(name string, userId uuid.UUID) (*models.Workspace, error) {
 	workspace := &models.Workspace{
 		ID:   uuid.New(),
 		Name: name,
 	}
 
 	if err := s.store.CreateWorkspace(workspace); err != nil {
-		return nil, err
+		return nil, customErrors.NewDatabaseError("failed to create workspace", err)
+	}
+
+	workspaceUser := &models.WorkspaceUser{
+		ID:          uuid.New(),
+		WorkspaceID: workspace.ID,
+		UserID:      userId,
+		Status:      models.WorkspaceStatusPending,
+	}
+
+	if err := s.store.CreateWorkspaceUser(workspaceUser); err != nil {
+		return nil, customErrors.NewDatabaseError("failed to create workspace user", err)
 	}
 
 	return workspace, nil

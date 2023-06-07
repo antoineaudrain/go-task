@@ -63,6 +63,48 @@ func (_c *Store_CreateWorkspace_Call) RunAndReturn(run func(*models.Workspace) e
 	return _c
 }
 
+// CreateWorkspaceUser provides a mock function with given fields: workspaceUser
+func (_m *Store) CreateWorkspaceUser(workspaceUser *models.WorkspaceUser) error {
+	ret := _m.Called(workspaceUser)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*models.WorkspaceUser) error); ok {
+		r0 = rf(workspaceUser)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Store_CreateWorkspaceUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateWorkspaceUser'
+type Store_CreateWorkspaceUser_Call struct {
+	*mock.Call
+}
+
+// CreateWorkspaceUser is a helper method to define mock.On call
+//   - workspaceUser *models.WorkspaceUser
+func (_e *Store_Expecter) CreateWorkspaceUser(workspaceUser interface{}) *Store_CreateWorkspaceUser_Call {
+	return &Store_CreateWorkspaceUser_Call{Call: _e.mock.On("CreateWorkspaceUser", workspaceUser)}
+}
+
+func (_c *Store_CreateWorkspaceUser_Call) Run(run func(workspaceUser *models.WorkspaceUser)) *Store_CreateWorkspaceUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*models.WorkspaceUser))
+	})
+	return _c
+}
+
+func (_c *Store_CreateWorkspaceUser_Call) Return(_a0 error) *Store_CreateWorkspaceUser_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Store_CreateWorkspaceUser_Call) RunAndReturn(run func(*models.WorkspaceUser) error) *Store_CreateWorkspaceUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 type mockConstructorTestingTNewStore interface {
 	mock.TestingT
 	Cleanup(func())

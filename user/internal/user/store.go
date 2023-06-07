@@ -14,7 +14,6 @@ type (
 	Store interface {
 		CreateUser(user *models.User) error
 		GetUserByEmail(email string) (*models.User, error)
-		GetUserByID(userID string) (*models.User, error)
 	}
 )
 
@@ -52,25 +51,6 @@ func (s *store) GetUserByEmail(email string) (*models.User, error) {
 	`
 
 	row := s.db.QueryRow(context.Background(), sqlStatement, email)
-
-	var user models.User
-	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash, &user.FullName)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-func (s *store) GetUserByID(userID string) (*models.User, error) {
-	sqlStatement := `
-		SELECT id, email, password_hash, full_name
-		FROM users
-		WHERE id = $1
-		LIMIT 1
-	`
-
-	row := s.db.QueryRow(context.Background(), sqlStatement, userID)
 
 	var user models.User
 	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash, &user.FullName)
