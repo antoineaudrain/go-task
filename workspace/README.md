@@ -1,6 +1,6 @@
-# Auth Service
+# Workspace Service
 
-This is the authentication microservice for a task management tool.
+This is the workspace microservice for a task management tool.
 
 ## Getting Started
 
@@ -14,8 +14,8 @@ This is the authentication microservice for a task management tool.
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/auth-service.git
-    cd auth-service
+    git clone https://github.com/antoineaudrain/go-task.git
+    cd go-task/workspace
     ```
    
 2. Install dependencies:
@@ -29,22 +29,24 @@ This is the authentication microservice for a task management tool.
 1. Generate gRPC Code:
 
     ```bash
-   protoc -I api/proto \
-    --go_out=api --go_opt=paths=source_relative \
-    --go-grpc_out=api --go-grpc_opt=paths=source_relative \
-    api/proto/workspace.proto
+   ./scripts/generate_protos.sh
     ```
 
-2. Build the service:
+2. Run the service without build:
 
     ```bash
-    go build -o auth-service ./cmd/main/main.go
+    ./scripts/run_dev.sh
+    ```
+3. Build the service:
+
+    ```bash
+    ./scripts/build.sh
     ```
 
-3. Run the service:
+4. Run the service:
 
     ```bash
-    ./auth-service
+    ./scripts/run_prod.sh
     ```
 
 By default, the service will listen on port 50051.
@@ -56,13 +58,13 @@ To build and run the service in a Docker container, make sure you have Docker in
 1. Build the Docker image:
 
     ```bash
-    docker build -t auth-service .
+    docker build -t workspace-service .
     ```
 
 2. Run the Docker container:
 
     ```bash
-    docker run -p 50051:50051 auth-service
+    docker run -p 50051:50051 workspace-service
     ```
 
 ### API Documentation
