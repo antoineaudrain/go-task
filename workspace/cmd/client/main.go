@@ -23,10 +23,10 @@ func main() {
 
 	client := pb.NewWorkspaceServiceClient(conn)
 
-	accessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODYxMzg1NzgsInN1YiI6IjQ5NmI5MWQyLWFlOTMtNDczZi04OTIzLTYyZDM5NTFkYmNjMCIsInRva2VuVHlwZSI6ImFjY2VzcyJ9.NwnB2YdArCeAM3JQRqHCtr7MfM8P0nAtHO70TOtZSRo"
-	res, err := client.Create(
+	accessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODYxNTMwNTgsInN1YiI6IjQ5NmI5MWQyLWFlOTMtNDczZi04OTIzLTYyZDM5NTFkYmNjMCIsInRva2VuVHlwZSI6ImFjY2VzcyJ9.umNIFdtb0IleD3z2EBBjP7x7bumE6mEgqAm3u9R1qGw"
+	res, err := client.CreateWorkspace(
 		metadata.AppendToOutgoingContext(context.Background(), "authorization", "Bearer "+accessToken),
-		&pb.CreateRequest{
+		&pb.CreateWorkspaceRequest{
 			Name: "My Workspace",
 		})
 	if err != nil {

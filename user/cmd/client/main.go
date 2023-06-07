@@ -25,8 +25,8 @@ func main() {
 		Password: "password",
 	})
 
-	//refreshToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODYxNTQzNjEsInVzZXJJZCI6Ijk0NTkyYmE3LTFmNTctNGMwYy1iNGQ0LWZjNDg2ODhhZmM3OCJ9.u49dcgXtHRS0edCbbrrq9sS7CEbglnr7gvOXvp3N2TM"
-	//user, err := client.RefreshToken(context.Background(), &pb.RefreshTokenRequest{
+	//refreshToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODYyMzg1MTcsInN1YiI6IjQ5NmI5MWQyLWFlOTMtNDczZi04OTIzLTYyZDM5NTFkYmNjMCIsInRva2VuVHlwZSI6InJlZnJlc2gifQ.dF5hqFiCu7vQm8JYCU2gVcwMwC9unq9aW5nrNDFMCTY"
+	//user, err := client.RefreshAccessToken(context.Background(), &pb.RefreshAccessTokenRequest{
 	//	RefreshToken: refreshToken,
 	//})
 

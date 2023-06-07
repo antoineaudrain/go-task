@@ -3,12 +3,14 @@ package user
 import (
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"go-task/core/pkg/logger"
 	"go-task/core/pkg/models"
 )
 
 type (
 	store struct {
-		db *pgxpool.Pool
+		db  *pgxpool.Pool
+		log logger.Logger
 	}
 
 	Store interface {
@@ -19,13 +21,13 @@ type (
 
 var _ Store = (*store)(nil)
 
-func NewStore(connStr string) (Store, error) {
+func NewStore(connStr string, log logger.Logger) (Store, error) {
 	db, err := pgxpool.Connect(context.Background(), connStr)
 	if err != nil {
 		return nil, err
 	}
 
-	return &store{db: db}, nil
+	return &store{db: db, log: log}, nil
 }
 
 func (s *store) CreateUser(user *models.User) error {
@@ -36,6 +38,7 @@ func (s *store) CreateUser(user *models.User) error {
 
 	_, err := s.db.Exec(context.Background(), sqlStatement, user.ID, user.Email, user.PasswordHash, user.FullName)
 	if err != nil {
+		s.log.Error("failed to create user", "error", err)
 		return err
 	}
 
@@ -55,6 +58,7 @@ func (s *store) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash, &user.FullName)
 	if err != nil {
+		s.log.Error("Failed to get user by email", "email", email, "error", err)
 		return nil, err
 	}
 

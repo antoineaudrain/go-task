@@ -5,23 +5,31 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"log"
 	"os"
 )
 
-var (
-	logger *zap.Logger
+type (
+	logger struct {
+		zap *zap.Logger
+	}
+
+	Logger interface {
+		Sync() error
+		Debug(msg string, keysAndValues ...interface{})
+		Info(msg string, keysAndValues ...interface{})
+		Warn(msg string, keysAndValues ...interface{})
+		Error(msg string, keysAndValues ...interface{})
+	}
 )
 
-func Init(namespace string) {
+var _ Logger = (*logger)(nil)
+
+func New(namespace string) Logger {
 	var core zapcore.Core
 	logFilename := fmt.Sprintf("logs/%s.log", namespace)
 
-	if os.Getenv("ENV") != "production" {
-		consoleConfig := zap.NewDevelopmentEncoderConfig()
-		consoleEncoder := zapcore.NewConsoleEncoder(consoleConfig)
-		core = zapcore.NewCore(consoleEncoder, zapcore.Lock(os.Stdout), zap.DebugLevel)
-	} else {
+	switch os.Getenv("ENV") {
+	case "production":
 		w := zapcore.AddSync(&lumberjack.Logger{
 			Filename:   logFilename,
 			MaxSize:    500,
@@ -34,29 +42,52 @@ func Init(namespace string) {
 			w,
 			zap.InfoLevel,
 		)
+	default:
+		consoleConfig := zap.NewDevelopmentEncoderConfig()
+		consoleEncoder := zapcore.NewConsoleEncoder(consoleConfig)
+		core = zapcore.NewCore(consoleEncoder, zapcore.Lock(os.Stdout), zap.DebugLevel)
 	}
 
-	logger = zap.New(core)
-
-	log.SetOutput(zap.NewStdLog(logger).Writer())
+	l := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
+	return &logger{
+		zap: l,
+	}
 }
 
-func Close() {
-	_ = logger.Sync()
+func (l *logger) Sync() error {
+	return l.zap.Sync()
 }
 
-func Debug(message string, args ...interface{}) {
-	logger.Debug(fmt.Sprintf(message, args...))
+func (l *logger) Debug(msg string, keysAndValues ...interface{}) {
+	fields := make([]zap.Field, len(keysAndValues)/2)
+	for i := 0; i < len(keysAndValues); i += 2 {
+		key := keysAndValues[i].(string)
+		value := keysAndValues[i+1]
+		fields[i/2] = zap.Any(key, value)
+	}
+	l.zap.Debug(msg, fields...)
 }
 
-func Info(message string, args ...interface{}) {
-	logger.Info(fmt.Sprintf(message, args...))
+func (l *logger) Info(msg string, keysAndValues ...interface{}) {
+	fields := make([]zap.Field, len(keysAndValues)/2)
+	for i := 0; i < len(keysAndValues); i += 2 {
+		key := keysAndValues[i].(string)
+		value := keysAndValues[i+1]
+		fields[i/2] = zap.Any(key, value)
+	}
+	l.zap.Info(msg, fields...)
 }
 
-func Warn(message string, args ...interface{}) {
-	logger.Warn(fmt.Sprintf(message, args...))
+func (l *logger) Warn(msg string, keysAndValues ...interface{}) {
+	fields := make([]zap.Field, len(keysAndValues)/2)
+	for i := 0; i < len(keysAndValues); i += 2 {
+		key := keysAndValues[i].(string)
+		value := keysAndValues[i+1]
+		fields[i/2] = zap.Any(key, value)
+	}
+	l.zap.Warn(msg, fields...)
 }
 
-func Error(message string, args ...interface{}) {
-	logger.Error(fmt.Sprintf(message, args...))
+func (l *logger) Error(msg string, keysAndValues ...interface{}) {
+	l.zap.Error(msg, zap.Any("error", keysAndValues))
 }
