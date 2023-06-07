@@ -12,7 +12,11 @@ func main() {
 	logger.Init("workspace")
 	defer logger.Close()
 
-	s := server.NewServer(os.Getenv("PORT"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "50051"
+	}
+	s := server.NewServer(port)
 
 	go func() {
 		if err := s.Run(); err != nil {
