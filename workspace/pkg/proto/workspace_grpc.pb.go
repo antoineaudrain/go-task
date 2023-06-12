@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: workspace.proto
+// source: board.proto
 
 package workspace
 
@@ -245,5 +245,5 @@ var WorkspaceService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "workspace.proto",
+	Metadata: "board.proto",
 }

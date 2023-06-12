@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+option go_package = "go-task/board";
+
+package board;
+
+service BoardService {
+  rpc CreateBoard(CreateBoardRequest) returns (CreateBoardResponse) {}
+  rpc GetBoard(GetBoardRequest) returns (GetBoardResponse) {}
+  rpc ListBoards(ListBoardRequest) returns (ListBoardResponse) {}
+  rpc UpdateBoard(UpdateBoardRequest) returns (UpdateBoardResponse) {}
+  rpc DeleteBoard(DeleteBoardRequest) returns (DeleteBoardResponse) {}
+}
+
+message CreateBoardRequest {
+  string name = 1;
+}
+
+message GetBoardRequest {
+  string boardID = 1;
+}
+
+message ListBoardRequest {
+}
+
+message UpdateBoardRequest {
+  string boardID = 1;
+  string name = 2;
+}
+
+message DeleteBoardRequest {
+  string boardID = 1;
+}
+
+message Board {
+  string id = 1;
+  string name = 2;
+  string createdAt = 3;
+  string updatedAt = 4;
+}
+
+message CreateBoardResponse {
+  Board board = 1;
+}
+
+message GetBoardResponse {
+  Board board = 1;
+}
+
+message ListBoardResponse {
+  repeated Board boards = 1;
+}
+
+message UpdateBoardResponse {
+  Board board = 1;
+}
+
+message DeleteBoardResponse {
+  Board board = 1;
+}
