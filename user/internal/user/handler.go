@@ -5,7 +5,7 @@ import (
 	"go-task/core/pkg/auth"
 	customErrors "go-task/core/pkg/errors"
 	"go-task/core/pkg/logger"
-	pb "go-task/user/api"
+	pb "go-task/user/pkg/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

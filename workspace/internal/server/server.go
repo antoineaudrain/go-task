@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go-task/core/pkg/auth"
 	"go-task/core/pkg/logger"
-	pb "go-task/user/api"
+	pb "go-task/user/pkg/proto"
 	"go-task/workspace/internal/workspace"
 	"google.golang.org/grpc"
 	"net"

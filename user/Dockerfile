@@ -17,7 +17,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o main ./cmd/main/main.go
+RUN go build -o main ./cmd/main.go
 
 # This container exposes port 50051 to the outside world
 EXPOSE 50051

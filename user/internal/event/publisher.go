@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/nats-io/nats.go"
-	pb "go-task/user/api"
+	pb "go-task/user/pkg/proto"
 	"google.golang.org/protobuf/proto"
 )
 

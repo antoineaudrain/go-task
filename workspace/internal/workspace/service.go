@@ -16,7 +16,11 @@ type (
 	}
 
 	Service interface {
-		CreateWorkspaceWithUser(name string, userId uuid.UUID) (*models.Workspace, error)
+		CreateWorkspaceWithUser(userID uuid.UUID, name string) (*models.Workspace, error)
+		GetWorkspace(userID, workspaceID uuid.UUID) (*models.Workspace, error)
+		ListWorkspaces(userID uuid.UUID) ([]*models.Workspace, error)
+		UpdateWorkspace(userID, workspaceID uuid.UUID, name string) (*models.Workspace, error)
+		DeleteWorkspace(userID, workspaceID uuid.UUID) (*models.Workspace, error)
 	}
 )
 
@@ -35,40 +39,106 @@ func NewService(log logger.Logger) Service {
 	}
 }
 
-func (s *service) CreateWorkspaceWithUser(name string, userId uuid.UUID) (*models.Workspace, error) {
+func (s *service) CreateWorkspaceWithUser(userID uuid.UUID, name string) (*models.Workspace, error) {
 	ctx := context.Background()
+	ctx = context.WithValue(ctx, "userID", userID)
+
 	tx, err := s.store.BeginTx(ctx)
 	if err != nil {
-		return nil, customErrors.NewDatabaseError("failed to start transaction", err)
+		s.log.Error("failed to begin transaction", "error", err)
+		return nil, customErrors.NewDatabaseError("failed to begin transaction", err)
 	}
 
-	workspace := &models.Workspace{
-		ID:   uuid.New(),
-		Name: name,
-	}
-
-	if err := s.store.CreateWorkspace(ctx, tx, workspace); err != nil {
-		_ = s.store.RollbackTx(ctx, tx)
+	workspace, err := s.store.CreateWorkspace(ctx, tx, name)
+	if err != nil {
+		_ = tx.Rollback(ctx)
 		s.log.Error("failed to create workspace", "error", err)
 		return nil, customErrors.NewDatabaseError("failed to create workspace", err)
 	}
 
-	workspaceUser := &models.WorkspaceUser{
-		ID:          uuid.New(),
-		WorkspaceID: workspace.ID,
-		UserID:      userId,
-		Status:      models.WorkspaceStatusPending,
-	}
-
-	if err := s.store.CreateWorkspaceUser(ctx, tx, workspaceUser); err != nil {
-		_ = s.store.RollbackTx(ctx, tx)
+	_, err = s.store.CreateWorkspaceUser(ctx, tx, workspace.ID)
+	if err != nil {
+		_ = tx.Rollback(ctx)
 		s.log.Error("failed to create workspace user", "error", err)
 		return nil, customErrors.NewDatabaseError("failed to create workspace user", err)
 	}
 
-	if err := tx.Commit(ctx); err != nil {
+	err = tx.Commit(ctx)
+	if err != nil {
 		s.log.Error("failed to commit transaction", "error", err)
 		return nil, customErrors.NewDatabaseError("failed to commit transaction", err)
+	}
+
+	return workspace, nil
+}
+
+func (s *service) GetWorkspace(userID, workspaceID uuid.UUID) (*models.Workspace, error) {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "userID", userID)
+
+	workspace, err := s.store.GetWorkspace(ctx, workspaceID)
+	if err != nil {
+		s.log.Error("failed to get workspaces", "error", err)
+		return nil, customErrors.NewDatabaseError("failed to get workspaces", err)
+	}
+
+	return workspace, nil
+}
+
+func (s *service) ListWorkspaces(userID uuid.UUID) ([]*models.Workspace, error) {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "userID", userID)
+
+	workspaces, err := s.store.ListWorkspaces(ctx)
+	if err != nil {
+		s.log.Error("failed to list workspaces", "error", err)
+		return nil, customErrors.NewDatabaseError("failed to list workspaces", err)
+	}
+
+	return workspaces, nil
+}
+
+func (s *service) UpdateWorkspace(userID, workspaceID uuid.UUID, name string) (*models.Workspace, error) {
+	ctx := context.Background()
+
+	tx, err := s.store.BeginTx(ctx)
+	if err != nil {
+		return nil, customErrors.NewDatabaseError("Failed to begin transaction", err)
+	}
+	defer tx.Rollback(ctx)
+
+	workspace, err := s.store.UpdateWorkspace(ctx, tx, workspaceID, userID, name)
+	if err != nil {
+		s.log.Error("Failed to update workspace", "error", err)
+		return nil, customErrors.NewDatabaseError("failed to update workspace", err)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return nil, customErrors.NewDatabaseError("Failed to commit transaction", err)
+	}
+
+	return workspace, nil
+}
+
+func (s *service) DeleteWorkspace(userID, workspaceID uuid.UUID) (*models.Workspace, error) {
+	ctx := context.Background()
+
+	tx, err := s.store.BeginTx(ctx)
+	if err != nil {
+		return nil, customErrors.NewDatabaseError("Failed to begin transaction", err)
+	}
+	defer tx.Rollback(ctx)
+
+	workspace, err := s.store.DeleteWorkspace(ctx, tx, workspaceID, userID)
+	if err != nil {
+		s.log.Error("Failed to delete workspace", "error", err)
+		return nil, customErrors.NewDatabaseError("failed to delete workspace", err)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return nil, customErrors.NewDatabaseError("Failed to commit transaction", err)
 	}
 
 	return workspace, nil

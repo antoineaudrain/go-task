@@ -23,25 +23,25 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// CreateWorkspaceWithUser provides a mock function with given fields: name, userId
-func (_m *Service) CreateWorkspaceWithUser(name string, userId uuid.UUID) (*models.Workspace, error) {
-	ret := _m.Called(name, userId)
+// CreateWorkspaceWithUser provides a mock function with given fields: userID, name
+func (_m *Service) CreateWorkspaceWithUser(userID uuid.UUID, name string) (*models.Workspace, error) {
+	ret := _m.Called(userID, name)
 
 	var r0 *models.Workspace
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, uuid.UUID) (*models.Workspace, error)); ok {
-		return rf(name, userId)
+	if rf, ok := ret.Get(0).(func(uuid.UUID, string) (*models.Workspace, error)); ok {
+		return rf(userID, name)
 	}
-	if rf, ok := ret.Get(0).(func(string, uuid.UUID) *models.Workspace); ok {
-		r0 = rf(name, userId)
+	if rf, ok := ret.Get(0).(func(uuid.UUID, string) *models.Workspace); ok {
+		r0 = rf(userID, name)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Workspace)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string, uuid.UUID) error); ok {
-		r1 = rf(name, userId)
+	if rf, ok := ret.Get(1).(func(uuid.UUID, string) error); ok {
+		r1 = rf(userID, name)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -55,15 +55,15 @@ type Service_CreateWorkspaceWithUser_Call struct {
 }
 
 // CreateWorkspaceWithUser is a helper method to define mock.On call
+//   - userID uuid.UUID
 //   - name string
-//   - userId uuid.UUID
-func (_e *Service_Expecter) CreateWorkspaceWithUser(name interface{}, userId interface{}) *Service_CreateWorkspaceWithUser_Call {
-	return &Service_CreateWorkspaceWithUser_Call{Call: _e.mock.On("CreateWorkspaceWithUser", name, userId)}
+func (_e *Service_Expecter) CreateWorkspaceWithUser(userID interface{}, name interface{}) *Service_CreateWorkspaceWithUser_Call {
+	return &Service_CreateWorkspaceWithUser_Call{Call: _e.mock.On("CreateWorkspaceWithUser", userID, name)}
 }
 
-func (_c *Service_CreateWorkspaceWithUser_Call) Run(run func(name string, userId uuid.UUID)) *Service_CreateWorkspaceWithUser_Call {
+func (_c *Service_CreateWorkspaceWithUser_Call) Run(run func(userID uuid.UUID, name string)) *Service_CreateWorkspaceWithUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(uuid.UUID))
+		run(args[0].(uuid.UUID), args[1].(string))
 	})
 	return _c
 }
@@ -73,7 +73,227 @@ func (_c *Service_CreateWorkspaceWithUser_Call) Return(_a0 *models.Workspace, _a
 	return _c
 }
 
-func (_c *Service_CreateWorkspaceWithUser_Call) RunAndReturn(run func(string, uuid.UUID) (*models.Workspace, error)) *Service_CreateWorkspaceWithUser_Call {
+func (_c *Service_CreateWorkspaceWithUser_Call) RunAndReturn(run func(uuid.UUID, string) (*models.Workspace, error)) *Service_CreateWorkspaceWithUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteWorkspace provides a mock function with given fields: userID, workspaceID
+func (_m *Service) DeleteWorkspace(userID uuid.UUID, workspaceID uuid.UUID) (*models.Workspace, error) {
+	ret := _m.Called(userID, workspaceID)
+
+	var r0 *models.Workspace
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) (*models.Workspace, error)); ok {
+		return rf(userID, workspaceID)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) *models.Workspace); ok {
+		r0 = rf(userID, workspaceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Workspace)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID, uuid.UUID) error); ok {
+		r1 = rf(userID, workspaceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_DeleteWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteWorkspace'
+type Service_DeleteWorkspace_Call struct {
+	*mock.Call
+}
+
+// DeleteWorkspace is a helper method to define mock.On call
+//   - userID uuid.UUID
+//   - workspaceID uuid.UUID
+func (_e *Service_Expecter) DeleteWorkspace(userID interface{}, workspaceID interface{}) *Service_DeleteWorkspace_Call {
+	return &Service_DeleteWorkspace_Call{Call: _e.mock.On("DeleteWorkspace", userID, workspaceID)}
+}
+
+func (_c *Service_DeleteWorkspace_Call) Run(run func(userID uuid.UUID, workspaceID uuid.UUID)) *Service_DeleteWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_DeleteWorkspace_Call) Return(_a0 *models.Workspace, _a1 error) *Service_DeleteWorkspace_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_DeleteWorkspace_Call) RunAndReturn(run func(uuid.UUID, uuid.UUID) (*models.Workspace, error)) *Service_DeleteWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspace provides a mock function with given fields: userID, workspaceID
+func (_m *Service) GetWorkspace(userID uuid.UUID, workspaceID uuid.UUID) (*models.Workspace, error) {
+	ret := _m.Called(userID, workspaceID)
+
+	var r0 *models.Workspace
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) (*models.Workspace, error)); ok {
+		return rf(userID, workspaceID)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) *models.Workspace); ok {
+		r0 = rf(userID, workspaceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Workspace)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID, uuid.UUID) error); ok {
+		r1 = rf(userID, workspaceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_GetWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspace'
+type Service_GetWorkspace_Call struct {
+	*mock.Call
+}
+
+// GetWorkspace is a helper method to define mock.On call
+//   - userID uuid.UUID
+//   - workspaceID uuid.UUID
+func (_e *Service_Expecter) GetWorkspace(userID interface{}, workspaceID interface{}) *Service_GetWorkspace_Call {
+	return &Service_GetWorkspace_Call{Call: _e.mock.On("GetWorkspace", userID, workspaceID)}
+}
+
+func (_c *Service_GetWorkspace_Call) Run(run func(userID uuid.UUID, workspaceID uuid.UUID)) *Service_GetWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID), args[1].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_GetWorkspace_Call) Return(_a0 *models.Workspace, _a1 error) *Service_GetWorkspace_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_GetWorkspace_Call) RunAndReturn(run func(uuid.UUID, uuid.UUID) (*models.Workspace, error)) *Service_GetWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListWorkspaces provides a mock function with given fields: userID
+func (_m *Service) ListWorkspaces(userID uuid.UUID) ([]*models.Workspace, error) {
+	ret := _m.Called(userID)
+
+	var r0 []*models.Workspace
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) ([]*models.Workspace, error)); ok {
+		return rf(userID)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) []*models.Workspace); ok {
+		r0 = rf(userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Workspace)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_ListWorkspaces_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListWorkspaces'
+type Service_ListWorkspaces_Call struct {
+	*mock.Call
+}
+
+// ListWorkspaces is a helper method to define mock.On call
+//   - userID uuid.UUID
+func (_e *Service_Expecter) ListWorkspaces(userID interface{}) *Service_ListWorkspaces_Call {
+	return &Service_ListWorkspaces_Call{Call: _e.mock.On("ListWorkspaces", userID)}
+}
+
+func (_c *Service_ListWorkspaces_Call) Run(run func(userID uuid.UUID)) *Service_ListWorkspaces_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_ListWorkspaces_Call) Return(_a0 []*models.Workspace, _a1 error) *Service_ListWorkspaces_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_ListWorkspaces_Call) RunAndReturn(run func(uuid.UUID) ([]*models.Workspace, error)) *Service_ListWorkspaces_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateWorkspace provides a mock function with given fields: userID, workspaceID, name
+func (_m *Service) UpdateWorkspace(userID uuid.UUID, workspaceID uuid.UUID, name string) (*models.Workspace, error) {
+	ret := _m.Called(userID, workspaceID, name)
+
+	var r0 *models.Workspace
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID, string) (*models.Workspace, error)); ok {
+		return rf(userID, workspaceID, name)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID, string) *models.Workspace); ok {
+		r0 = rf(userID, workspaceID, name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Workspace)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID, uuid.UUID, string) error); ok {
+		r1 = rf(userID, workspaceID, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_UpdateWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateWorkspace'
+type Service_UpdateWorkspace_Call struct {
+	*mock.Call
+}
+
+// UpdateWorkspace is a helper method to define mock.On call
+//   - userID uuid.UUID
+//   - workspaceID uuid.UUID
+//   - name string
+func (_e *Service_Expecter) UpdateWorkspace(userID interface{}, workspaceID interface{}, name interface{}) *Service_UpdateWorkspace_Call {
+	return &Service_UpdateWorkspace_Call{Call: _e.mock.On("UpdateWorkspace", userID, workspaceID, name)}
+}
+
+func (_c *Service_UpdateWorkspace_Call) Run(run func(userID uuid.UUID, workspaceID uuid.UUID, name string)) *Service_UpdateWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID), args[1].(uuid.UUID), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Service_UpdateWorkspace_Call) Return(_a0 *models.Workspace, _a1 error) *Service_UpdateWorkspace_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_UpdateWorkspace_Call) RunAndReturn(run func(uuid.UUID, uuid.UUID, string) (*models.Workspace, error)) *Service_UpdateWorkspace_Call {
 	_c.Call.Return(run)
 	return _c
 }

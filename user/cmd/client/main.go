@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	pb "go-task/user/api"
+	pb "go-task/user/pkg/proto"
 	"google.golang.org/grpc"
 )
 
@@ -14,7 +14,7 @@ func main() {
 	}
 
 	client := pb.NewUserServiceClient(dial)
-	//user, err := client.Create(context.Background(), &pb.CreateRequest{
+	//user, err := client.CreateUser(context.Background(), &pb.CreateUserRequest{
 	//	Email:    "johndoe@example.com",
 	//	Password: "password",
 	//	FullName: "John Doe",

@@ -51,3 +51,16 @@ func NewAuthenticationError(message string, err error) *AuthenticationError {
 		},
 	}
 }
+
+type NotFoundError struct {
+	BaseError
+}
+
+func NewNotFoundError(message string, err error) *NotFoundError {
+	return &NotFoundError{
+		BaseError: BaseError{
+			Message: message,
+			Err:     err,
+		},
+	}
+}

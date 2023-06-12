@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/metadata"
 	"os"
 	"strings"
@@ -89,28 +90,33 @@ func ExtractAccessTokenFromContext(ctx context.Context) string {
 	return accessToken
 }
 
-func Authenticate(ctx context.Context) (string, error) {
+func Authenticate(ctx context.Context) (uuid.UUID, error) {
 	accessToken := ctx.Value("accessToken").(string)
 	if accessToken == "" {
-		return "", errors.New("missing access token")
+		return uuid.UUID{}, errors.New("missing access token")
 	}
 
 	accessTokenClaims, err := parseJWT(accessToken)
 	if err != nil {
-		return "", err
+		return uuid.UUID{}, err
 	}
 
 	tokenType, ok := accessTokenClaims["tokenType"].(string)
 	if !ok || tokenType != TokenTypeAccess {
-		return "", errors.New("invalid access token")
+		return uuid.UUID{}, errors.New("invalid access token")
 	}
 
 	userID, ok := accessTokenClaims["sub"].(string)
-	if !ok {
-		return "", errors.New("user ID not found in access token claims")
+	if !ok || userID == "" {
+		return uuid.UUID{}, errors.New("user ID not found in access token claims")
 	}
 
-	return userID, nil
+	parsedUserID, err := uuid.Parse(userID)
+	if err != nil {
+		return uuid.UUID{}, errors.New("invalid user ID")
+	}
+
+	return parsedUserID, nil
 }
 
 func parseJWT(tokenString string) (jwt.MapClaims, error) {

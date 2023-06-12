@@ -5,26 +5,27 @@ import (
 	"time"
 )
 
+type WorkspaceStatus string
+
 const (
-	WorkspaceStatusPending  = "pending"
-	WorkspaceStatusSent     = "sent"
-	WorkspaceStatusAccepted = "accepted"
-	WorkspaceStatusRejected = "rejected"
+	StatusPending  WorkspaceStatus = "pending"
+	StatusSent     WorkspaceStatus = "sent"
+	StatusAccepted WorkspaceStatus = "accepted"
+	StatusRejected WorkspaceStatus = "rejected"
 )
 
 type Workspace struct {
-	ID          uuid.UUID
-	Name        string
-	Description string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID        uuid.UUID
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type WorkspaceUser struct {
 	ID          uuid.UUID
 	WorkspaceID uuid.UUID
 	UserID      uuid.UUID
-	Status      string
+	Status      WorkspaceStatus
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

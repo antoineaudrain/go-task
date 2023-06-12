@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+option go_package = "go-task/workspace";
+
+package workspace;
+
+service WorkspaceService {
+  rpc CreateWorkspace(CreateWorkspaceRequest) returns (CreateWorkspaceResponse) {}
+  rpc GetWorkspace(GetWorkspaceRequest) returns (GetWorkspaceResponse) {}
+  rpc ListWorkspaces(ListWorkspaceRequest) returns (ListWorkspaceResponse) {}
+  rpc UpdateWorkspace(UpdateWorkspaceRequest) returns (UpdateWorkspaceResponse) {}
+  rpc DeleteWorkspace(DeleteWorkspaceRequest) returns (DeleteWorkspaceResponse) {}
+}
+
+message CreateWorkspaceRequest {
+  string name = 1;
+}
+
+message GetWorkspaceRequest {
+  string workspaceID = 1;
+}
+
+message ListWorkspaceRequest {
+}
+
+message UpdateWorkspaceRequest {
+  string workspaceID = 1;
+  string name = 2;
+}
+
+message DeleteWorkspaceRequest {
+  string workspaceID = 1;
+}
+
+message Workspace {
+  string id = 1;
+  string name = 2;
+  string createdAt = 3;
+  string updatedAt = 4;
+}
+
+message CreateWorkspaceResponse {
+  Workspace workspace = 1;
+}
+
+message GetWorkspaceResponse {
+  Workspace workspace = 1;
+}
+
+message ListWorkspaceResponse {
+  repeated Workspace workspaces = 1;
+}
+
+message UpdateWorkspaceResponse {
+  Workspace workspace = 1;
+}
+
+message DeleteWorkspaceResponse {
+  Workspace workspace = 1;
+}

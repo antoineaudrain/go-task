@@ -14,7 +14,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	pb "go-task/user/api"
+	pb "go-task/user/pkg/proto"
 )
 
 func TestHandler_Create(t *testing.T) {
@@ -103,7 +103,7 @@ func TestHandler_Create(t *testing.T) {
 			FullName: "Test User",
 		}
 
-		mockError := errors.New("database error")
+		mockError := errors.New("transaction error")
 		mockService.EXPECT().CreateUserWithHashedPassword(req.GetEmail(), req.GetPassword(), req.GetFullName()).Return(nil, customErrors.NewDatabaseError("failed to create user", mockError))
 
 		resp, err := handler.CreateUser(context.Background(), req)
