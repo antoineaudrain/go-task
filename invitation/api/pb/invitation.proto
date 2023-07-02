@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/antoineaudrain/go-task/invitation";
+
+package invitation;
+
+service InvitationService {
+  rpc SendWorkspaceInvitation(SendWorkspaceInvitationRequest) returns (SendWorkspaceInvitationResponse) {}
+}
+
+message SendWorkspaceInvitationRequest {
+  string workspaceId = 1;
+  string email = 2;
+}
+
+message SendWorkspaceInvitationResponse {
+  bool success = 1;
+}
