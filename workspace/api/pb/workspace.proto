@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+option go_package = "github.com/antoineaudrain/workspace";
+
+package api;
+
+service WorkspaceService {
+  rpc CreateWorkspace(CreateWorkspaceRequest) returns (CreateWorkspaceResponse) {}
+  rpc GetWorkspace(GetWorkspaceRequest) returns (GetWorkspaceResponse) {}
+  rpc UpdateWorkspace(UpdateWorkspaceRequest) returns (UpdateWorkspaceResponse) {}
+  rpc DeleteWorkspace(DeleteWorkspaceRequest) returns (DeleteWorkspaceResponse) {}
+  rpc ListWorkspaceMembers(ListWorkspaceMembersRequest) returns (ListWorkspaceMembersResponse) {}
+  rpc InviteWorkspaceMember(InviteWorkspaceMemberRequest) returns (InviteWorkspaceMemberResponse) {}
+  rpc RemoveWorkspaceMember(RemoveWorkspaceMemberRequest) returns (RemoveWorkspaceMemberResponse) {}
+}
+
+message Workspace {
+  string id = 1;
+  string name = 2;
+  string ownerId = 3;
+  string createdAt = 4;
+  string updatedAt = 5;
+}
+
+message WorkspaceMember {
+  string id = 1;
+  string workspaceId = 2;
+  string userId = 3;
+  string role = 4;
+  string invitationId = 5;
+  string createdAt = 6;
+  string updatedAt = 7;
+}
+
+message CreateWorkspaceRequest {
+  string name = 1;
+}
+
+message CreateWorkspaceResponse {
+  Workspace workspace = 1;
+}
+
+message WorkspaceCreatedEvent {
+  string id = 1;
+  string workspace_id = 2;
+  string workspace_name = 3;
+}
+
+message GetWorkspaceRequest {
+  string workspaceId = 1;
+}
+
+message GetWorkspaceResponse {
+  Workspace workspace = 1;
+}
+
+message UpdateWorkspaceRequest {
+  string workspaceId = 1;
+  string name = 2;
+}
+
+message UpdateWorkspaceResponse {
+  Workspace workspace = 1;
+}
+
+message DeleteWorkspaceRequest {
+  string workspaceId = 1;
+}
+
+message DeleteWorkspaceResponse {
+  bool success = 1;
+}
+
+message ListWorkspaceMembersRequest {
+  string workspaceId = 1;
+}
+
+message ListWorkspaceMembersResponse {
+  repeated WorkspaceMember members = 1;
+}
+
+message InviteWorkspaceMemberRequest {
+  string workspaceId = 1;
+  string email = 2;
+}
+
+message InviteWorkspaceMemberResponse {
+  WorkspaceMember member = 1;
+}
+
+message RemoveWorkspaceMemberRequest {
+  string workspaceId = 1;
+  string memberId = 2;
+}
+
+message RemoveWorkspaceMemberResponse {
+  bool success = 1;
+}

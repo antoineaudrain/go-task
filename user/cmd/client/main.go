@@ -14,6 +14,7 @@ func main() {
 	}
 
 	client := pb.NewUserServiceClient(dial)
+
 	//user, err := client.CreateUser(context.Background(), &pb.CreateUserRequest{
 	//	Email:    "johndoe@example.com",
 	//	Password: "password",

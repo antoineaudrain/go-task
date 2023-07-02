@@ -3,61 +3,97 @@ package server
 import (
 	"context"
 	"fmt"
-	"go-task/core/pkg/auth"
-	"go-task/core/pkg/logger"
-	pb "go-task/user/pkg/proto"
-	"go-task/workspace/internal/workspace"
+	"github.com/antoineaudrain/go-task/core/pkg/auth"
+	pb "github.com/antoineaudrain/go-task/workspace/api"
+	app "github.com/antoineaudrain/go-task/workspace/internal/app/handlers"
+	"github.com/antoineaudrain/go-task/workspace/internal/infrastructure/persistence"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 	"net"
 )
 
 type Server struct {
 	grpcServer *grpc.Server
-	userClient pb.UserServiceClient
-	log        logger.Logger
-	port       string
+	logger     *zap.Logger
+	db         *gorm.DB
 }
 
-func NewServer(port string, log logger.Logger) *Server {
+func NewServer(logger *zap.Logger, db *gorm.DB) *Server {
 	return &Server{
-		port: port,
-		log:  log,
+		db:     db,
+		logger: logger,
 	}
 }
 
-func (s *Server) Run() error {
-	conn, err := net.Listen("tcp", fmt.Sprintf(":%s", s.port))
+func (s *Server) Start(port int) {
+	conn, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
 	if err != nil {
-		s.log.Error(fmt.Sprintf("failed to listen on port %s", s.port), "error", err)
-		return err
+		s.logger.Error(fmt.Sprintf("Failed to listen on port %d", port), zap.Error(err))
+		return
 	}
 
-	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(s.interceptor))
+	s.grpcServer = grpc.NewServer(grpc.UnaryInterceptor(s.unaryInterceptor))
 
-	workspaceHandler := workspace.NewHandler(s.log)
-	workspaceHandler.Register(s.grpcServer)
+	workspaceRepo := persistence.NewWorkspaceRepository(s.db)
+	memberRepo := persistence.NewMemberRepository(s.db)
 
-	s.log.Info(fmt.Sprintf("Server started and listening on %s", conn.Addr().String()))
+	handler := app.NewWorkspaceHandler(s.logger, workspaceRepo, memberRepo)
+
+	pb.RegisterWorkspaceServiceServer(s.grpcServer, handler)
+
+	s.logger.Info(fmt.Sprintf("Server started and listening on %s", conn.Addr().String()))
 
 	if err := s.grpcServer.Serve(conn); err != nil {
-		s.log.Error("failed to serve", "error", err)
-		return err
+		s.logger.Error("Failed to serve", zap.Error(err))
+		return
 	}
-
-	return nil
 }
 
-func (s *Server) Shutdown() {
+func (s *Server) Stop() {
 	if s.grpcServer != nil {
 		s.grpcServer.GracefulStop()
-		s.log.Info("Server stopped gracefully.")
+		s.logger.Info("Server stopped gracefully.")
 	}
 }
 
-func (s *Server) interceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	s.log.Info(fmt.Sprintf("Received request for method: %s", info.FullMethod))
+func (s *Server) unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		s.logger.Warn("Failed to extract metadata")
+		return handler(ctx, req)
+	}
 
-	accessToken := auth.ExtractAccessTokenFromContext(ctx)
-	ctx = context.WithValue(ctx, "accessToken", accessToken)
-	return handler(ctx, req)
+	authHeaders := md.Get("authorization")
+	if len(authHeaders) == 0 {
+		s.logger.Warn("Authorization header not found")
+		return handler(ctx, req)
+	}
+
+	authToken := auth.ExtractAuthenticationToken(authHeaders[0])
+
+	s.logger.Info("New request received",
+		zap.String("method", info.FullMethod),
+		zap.String("authToken", authToken),
+	)
+
+	userID, err := auth.ValidateAccessToken(authToken)
+	if len(authHeaders) == 0 {
+		s.logger.Warn("Invalid auth token")
+		return handler(ctx, req)
+	}
+
+	ctx = context.WithValue(ctx, "authenticatedUserID", userID)
+
+	resp, err := handler(ctx, req)
+
+	s.logger.Info("Request completed",
+		zap.String("method", info.FullMethod),
+		zap.String("authToken", authToken),
+		zap.String("status", status.Code(err).String()),
+	)
+
+	return resp, err
 }

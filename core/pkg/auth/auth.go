@@ -25,8 +25,9 @@ const (
 type Auth interface {
 	GenerateRefreshToken(userId string) (string, error)
 	GenerateAccessToken(refreshToken string) (string, error)
-	ExtractAccessTokenFromContext(ctx context.Context) string
+	ExtractAuthenticationToken(authHeader string) string
 	Authenticate(ctx context.Context) (string, error)
+	ParseJWT(tokenString string) (jwt.MapClaims, error)
 }
 
 func GenerateRefreshToken(userId string) (string, error) {
@@ -46,7 +47,7 @@ func GenerateRefreshToken(userId string) (string, error) {
 }
 
 func GenerateAccessToken(refreshToken string) (string, error) {
-	refreshTokenClaims, err := parseJWT(refreshToken)
+	refreshTokenClaims, err := ParseJWT(refreshToken)
 	if err != nil {
 		return "", fmt.Errorf("error parsing refresh token: %v", err)
 	}
@@ -68,6 +69,54 @@ func GenerateAccessToken(refreshToken string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func ExtractAuthenticationToken(authHeader string) string {
+	accessToken := ""
+	if strings.HasPrefix(authHeader, "Bearer ") {
+		accessToken = strings.TrimPrefix(authHeader, "Bearer ")
+	} else {
+		accessToken = authHeader
+	}
+	return accessToken
+}
+
+func ValidateAccessToken(token string) (*uuid.UUID, error) {
+	accessTokenClaims, err := ParseJWT(token)
+
+	tokenType, ok := accessTokenClaims["tokenType"].(string)
+	if !ok || tokenType != TokenTypeAccess {
+		return nil, errors.New("invalid access token type")
+	}
+
+	userID, ok := accessTokenClaims["sub"].(string)
+	if !ok || userID == "" {
+		return nil, errors.New("user ID not found in access token")
+	}
+
+	parsedUserID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, errors.New("invalid access token user ID")
+	}
+
+	return &parsedUserID, nil
+}
+
+func ParseJWT(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET_KEY")), nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse JWT: %v", err)
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, errors.New("invalid JWT")
+	}
+
+	return claims, nil
 }
 
 func ExtractAccessTokenFromContext(ctx context.Context) string {
